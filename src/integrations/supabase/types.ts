@@ -9,154 +9,93 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      agent_memory_embeddings: {
+      alunos: {
         Row: {
-          agent_id: string
-          content: string
-          created_at: string | null
-          embedding: string | null
-          id: number
-        }
-        Insert: {
-          agent_id: string
-          content: string
-          created_at?: string | null
-          embedding?: string | null
-          id?: number
-        }
-        Update: {
-          agent_id?: string
-          content?: string
-          created_at?: string | null
-          embedding?: string | null
-          id?: number
-        }
-        Relationships: []
-      }
-      agent_message_history: {
-        Row: {
-          created_at: string | null
-          id: number
-          message: Json
-          session_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          id?: number
-          message: Json
-          session_id: string
-        }
-        Update: {
-          created_at?: string | null
-          id?: number
-          message?: Json
-          session_id?: string
-        }
-        Relationships: []
-      }
-      agents: {
-        Row: {
-          agent_type: string
+          aluno_id: number
           created_at: string
-          created_by: string
-          custom_prompt: string | null
-          description: string | null
-          id: string
-          model_name: string
-          name: string
-          temperature: number
-          tools: Json | null
-          webhook_auth_required: boolean | null
-          webhook_enabled: boolean | null
-        }
-        Insert: {
-          agent_type: string
-          created_at: string
-          created_by: string
-          custom_prompt?: string | null
-          description?: string | null
-          id: string
-          model_name: string
-          name: string
-          temperature: number
-          tools?: Json | null
-          webhook_auth_required?: boolean | null
-          webhook_enabled?: boolean | null
-        }
-        Update: {
-          agent_type?: string
-          created_at?: string
-          created_by?: string
-          custom_prompt?: string | null
-          description?: string | null
-          id?: string
-          model_name?: string
-          name?: string
-          temperature?: number
-          tools?: Json | null
-          webhook_auth_required?: boolean | null
-          webhook_enabled?: boolean | null
-        }
-        Relationships: []
-      }
-      clientes_followUP: {
-        Row: {
-          data_envio1: string | null
-          data_envio2: string | null
-          data_envio3: string | null
-          "follow-up1": string | null
-          "follow-up2": string | null
-          "follow-up3": string | null
-          followup: string | null
-          id: number
-          mensagem1: string | null
-          mensagem2: string | null
-          mensagem3: string | null
+          email: string | null
+          idade: string | null
           nome: string | null
-          numero: string | null
-          sessionId: string | null
-          situacao: string | null
-          ultima_atividade: string | null
+          plano_ativo: boolean | null
+          telefone: string | null
+          yupchat_id: string | null
         }
         Insert: {
-          data_envio1?: string | null
-          data_envio2?: string | null
-          data_envio3?: string | null
-          "follow-up1"?: string | null
-          "follow-up2"?: string | null
-          "follow-up3"?: string | null
-          followup?: string | null
-          id?: number
-          mensagem1?: string | null
-          mensagem2?: string | null
-          mensagem3?: string | null
+          aluno_id?: number
+          created_at?: string
+          email?: string | null
+          idade?: string | null
           nome?: string | null
-          numero?: string | null
-          sessionId?: string | null
-          situacao?: string | null
-          ultima_atividade?: string | null
+          plano_ativo?: boolean | null
+          telefone?: string | null
+          yupchat_id?: string | null
         }
         Update: {
-          data_envio1?: string | null
-          data_envio2?: string | null
-          data_envio3?: string | null
-          "follow-up1"?: string | null
-          "follow-up2"?: string | null
-          "follow-up3"?: string | null
-          followup?: string | null
-          id?: number
-          mensagem1?: string | null
-          mensagem2?: string | null
-          mensagem3?: string | null
+          aluno_id?: number
+          created_at?: string
+          email?: string | null
+          idade?: string | null
           nome?: string | null
-          numero?: string | null
-          sessionId?: string | null
-          situacao?: string | null
-          ultima_atividade?: string | null
+          plano_ativo?: boolean | null
+          telefone?: string | null
+          yupchat_id?: string | null
         }
         Relationships: []
       }
-      documents_coi: {
+      anamnese: {
+        Row: {
+          altura: number | null
+          aluno_id: number | null
+          anamnese_id: number
+          created_at: string
+          idade: number | null
+          pergunta1: string | null
+          pergunta2: string | null
+          pergunta3: string | null
+          pergunta4: string | null
+          pergunta5: string | null
+          peso: number | null
+          score: number | null
+        }
+        Insert: {
+          altura?: number | null
+          aluno_id?: number | null
+          anamnese_id?: number
+          created_at?: string
+          idade?: number | null
+          pergunta1?: string | null
+          pergunta2?: string | null
+          pergunta3?: string | null
+          pergunta4?: string | null
+          pergunta5?: string | null
+          peso?: number | null
+          score?: number | null
+        }
+        Update: {
+          altura?: number | null
+          aluno_id?: number | null
+          anamnese_id?: number
+          created_at?: string
+          idade?: number | null
+          pergunta1?: string | null
+          pergunta2?: string | null
+          pergunta3?: string | null
+          pergunta4?: string | null
+          pergunta5?: string | null
+          peso?: number | null
+          score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "anamnese_aluno_id_fkey"
+            columns: ["aluno_id"]
+            isOneToOne: false
+            referencedRelation: "alunos"
+            referencedColumns: ["aluno_id"]
+          },
+        ]
+      }
+      descricao_treinamentos_rag: {
         Row: {
           content: string | null
           embedding: string | null
@@ -177,7 +116,7 @@ export type Database = {
         }
         Relationships: []
       }
-      documents_ecoloop: {
+      faq_weburn_rag: {
         Row: {
           content: string | null
           embedding: string | null
@@ -198,780 +137,154 @@ export type Database = {
         }
         Relationships: []
       }
-      documents_family_brokers: {
+      log_view: {
         Row: {
-          content: string | null
-          embedding: string | null
-          id: number
-          metadata: Json | null
+          aluno_id: number | null
+          created_at: string
+          data_acesso: string | null
+          dias_desde_cadastro: number | null
+          log_view_id: number
+          nome_aluno: string | null
+          nome_curso: string | null
+          nome_licao: string | null
+          nome_modulo: string | null
+          plano_ativo: boolean | null
+          professor: string | null
+          telefone_aluno: string | null
         }
         Insert: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
+          aluno_id?: number | null
+          created_at?: string
+          data_acesso?: string | null
+          dias_desde_cadastro?: number | null
+          log_view_id?: number
+          nome_aluno?: string | null
+          nome_curso?: string | null
+          nome_licao?: string | null
+          nome_modulo?: string | null
+          plano_ativo?: boolean | null
+          professor?: string | null
+          telefone_aluno?: string | null
         }
         Update: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
+          aluno_id?: number | null
+          created_at?: string
+          data_acesso?: string | null
+          dias_desde_cadastro?: number | null
+          log_view_id?: number
+          nome_aluno?: string | null
+          nome_curso?: string | null
+          nome_licao?: string | null
+          nome_modulo?: string | null
+          plano_ativo?: boolean | null
+          professor?: string | null
+          telefone_aluno?: string | null
         }
-        Relationships: []
-      }
-      documents_fbm: {
-        Row: {
-          content: string | null
-          embedding: string | null
-          id: number
-          metadata: Json | null
-        }
-        Insert: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-        }
-        Update: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-        }
-        Relationships: []
-      }
-      documents_fbm_cursos: {
-        Row: {
-          content: string | null
-          embedding: string | null
-          id: number
-          metadata: Json | null
-        }
-        Insert: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-        }
-        Update: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-        }
-        Relationships: []
-      }
-      documents_fbm_suporte: {
-        Row: {
-          content: string | null
-          embedding: string | null
-          id: number
-          metadata: Json | null
-        }
-        Insert: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-        }
-        Update: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-        }
-        Relationships: []
-      }
-      documents_jf_engenharia: {
-        Row: {
-          content: string | null
-          embedding: string | null
-          id: number
-          metadata: Json | null
-        }
-        Insert: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-        }
-        Update: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-        }
-        Relationships: []
-      }
-      documents_paz: {
-        Row: {
-          content: string | null
-          embedding: string | null
-          id: number
-          metadata: Json | null
-        }
-        Insert: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-        }
-        Update: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-        }
-        Relationships: []
-      }
-      documents_petland: {
-        Row: {
-          content: string | null
-          embedding: string | null
-          id: number
-          metadata: Json | null
-        }
-        Insert: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-        }
-        Update: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-        }
-        Relationships: []
-      }
-      documents_petland_sac: {
-        Row: {
-          content: string | null
-          embedding: string | null
-          id: number
-          metadata: Json | null
-        }
-        Insert: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-        }
-        Update: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-        }
-        Relationships: []
-      }
-      documents_regus: {
-        Row: {
-          content: string | null
-          embedding: string | null
-          id: number
-          metadata: Json | null
-        }
-        Insert: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-        }
-        Update: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-        }
-        Relationships: []
-      }
-      documents_service_quality: {
-        Row: {
-          content: string | null
-          embedding: string | null
-          id: number
-          metadata: Json | null
-        }
-        Insert: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-        }
-        Update: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-        }
-        Relationships: []
-      }
-      documents_setfin: {
-        Row: {
-          content: string | null
-          embedding: string | null
-          id: number
-          metadata: Json | null
-        }
-        Insert: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-        }
-        Update: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-        }
-        Relationships: []
-      }
-      documents_ticket360: {
-        Row: {
-          content: string | null
-          embedding: string | null
-          id: number
-          metadata: Json | null
-        }
-        Insert: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-        }
-        Update: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-        }
-        Relationships: []
-      }
-      documents_vsd_jiu_jitsu: {
-        Row: {
-          content: string | null
-          embedding: string | null
-          id: number
-          metadata: Json | null
-        }
-        Insert: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-        }
-        Update: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-        }
-        Relationships: []
-      }
-      documents_weburn: {
-        Row: {
-          content: string | null
-          embedding: string | null
-          id: number
-          metadata: Json | null
-        }
-        Insert: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-        }
-        Update: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-        }
-        Relationships: []
-      }
-      documents_zarpo: {
-        Row: {
-          content: string | null
-          embedding: string | null
-          id: number
-          metadata: Json | null
-        }
-        Insert: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-        }
-        Update: {
-          content?: string | null
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-        }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "log_view_aluno_id_fkey"
+            columns: ["aluno_id"]
+            isOneToOne: false
+            referencedRelation: "alunos"
+            referencedColumns: ["aluno_id"]
+          },
+        ]
       }
       n8n_chat_histories: {
         Row: {
+          followup: number | null
           id: number
           message: Json
           session_id: string
+          timestamptz: string | null
         }
         Insert: {
+          followup?: number | null
           id?: number
           message: Json
           session_id: string
+          timestamptz?: string | null
         }
         Update: {
+          followup?: number | null
           id?: number
           message?: Json
           session_id?: string
-        }
-        Relationships: []
-      }
-      n8n_chat_histories_coi: {
-        Row: {
-          id: number
-          message: Json
-          session_id: string
-        }
-        Insert: {
-          id?: number
-          message: Json
-          session_id: string
-        }
-        Update: {
-          id?: number
-          message?: Json
-          session_id?: string
-        }
-        Relationships: []
-      }
-      n8n_chat_histories_detran: {
-        Row: {
-          id: number
-          message: Json
-          session_id: string
-        }
-        Insert: {
-          id?: number
-          message: Json
-          session_id: string
-        }
-        Update: {
-          id?: number
-          message?: Json
-          session_id?: string
-        }
-        Relationships: []
-      }
-      n8n_chat_histories_ecoloop: {
-        Row: {
-          id: number
-          message: Json
-          session_id: string
-        }
-        Insert: {
-          id?: number
-          message: Json
-          session_id: string
-        }
-        Update: {
-          id?: number
-          message?: Json
-          session_id?: string
-        }
-        Relationships: []
-      }
-      n8n_chat_histories_farmacia_alopatica: {
-        Row: {
-          id: number
-          message: Json
-          session_id: string
-        }
-        Insert: {
-          id?: number
-          message: Json
-          session_id: string
-        }
-        Update: {
-          id?: number
-          message?: Json
-          session_id?: string
-        }
-        Relationships: []
-      }
-      n8n_chat_histories_fbm: {
-        Row: {
-          id: number
-          message: Json
-          session_id: string
-        }
-        Insert: {
-          id?: number
-          message: Json
-          session_id: string
-        }
-        Update: {
-          id?: number
-          message?: Json
-          session_id?: string
-        }
-        Relationships: []
-      }
-      n8n_chat_histories_fbm_cursos: {
-        Row: {
-          id: number
-          message: Json
-          session_id: string
-        }
-        Insert: {
-          id?: number
-          message: Json
-          session_id: string
-        }
-        Update: {
-          id?: number
-          message?: Json
-          session_id?: string
-        }
-        Relationships: []
-      }
-      n8n_chat_histories_fbm_suporte: {
-        Row: {
-          id: number
-          message: Json
-          session_id: string
-        }
-        Insert: {
-          id?: number
-          message: Json
-          session_id: string
-        }
-        Update: {
-          id?: number
-          message?: Json
-          session_id?: string
-        }
-        Relationships: []
-      }
-      n8n_chat_histories_followup: {
-        Row: {
-          id: number
-          message: Json
-          session_id: string
-        }
-        Insert: {
-          id?: number
-          message: Json
-          session_id: string
-        }
-        Update: {
-          id?: number
-          message?: Json
-          session_id?: string
-        }
-        Relationships: []
-      }
-      n8n_chat_histories_ingressos: {
-        Row: {
-          id: number
-          message: Json
-          session_id: string
-        }
-        Insert: {
-          id?: number
-          message: Json
-          session_id: string
-        }
-        Update: {
-          id?: number
-          message?: Json
-          session_id?: string
-        }
-        Relationships: []
-      }
-      n8n_chat_histories_jf_engenharia: {
-        Row: {
-          id: number
-          message: Json
-          session_id: string
-        }
-        Insert: {
-          id?: number
-          message: Json
-          session_id: string
-        }
-        Update: {
-          id?: number
-          message?: Json
-          session_id?: string
-        }
-        Relationships: []
-      }
-      n8n_chat_histories_leao: {
-        Row: {
-          id: number
-          message: Json
-          session_id: string
-        }
-        Insert: {
-          id?: number
-          message: Json
-          session_id: string
-        }
-        Update: {
-          id?: number
-          message?: Json
-          session_id?: string
-        }
-        Relationships: []
-      }
-      n8n_chat_histories_paz: {
-        Row: {
-          id: number
-          message: Json
-          session_id: string
-        }
-        Insert: {
-          id?: number
-          message: Json
-          session_id: string
-        }
-        Update: {
-          id?: number
-          message?: Json
-          session_id?: string
-        }
-        Relationships: []
-      }
-      n8n_chat_histories_petland: {
-        Row: {
-          id: number
-          message: Json
-          session_id: string
-        }
-        Insert: {
-          id?: number
-          message: Json
-          session_id: string
-        }
-        Update: {
-          id?: number
-          message?: Json
-          session_id?: string
-        }
-        Relationships: []
-      }
-      n8n_chat_histories_petland_sac: {
-        Row: {
-          id: number
-          message: Json
-          session_id: string
-        }
-        Insert: {
-          id?: number
-          message: Json
-          session_id: string
-        }
-        Update: {
-          id?: number
-          message?: Json
-          session_id?: string
-        }
-        Relationships: []
-      }
-      n8n_chat_histories_regus: {
-        Row: {
-          id: number
-          message: Json
-          session_id: string
-        }
-        Insert: {
-          id?: number
-          message: Json
-          session_id: string
-        }
-        Update: {
-          id?: number
-          message?: Json
-          session_id?: string
-        }
-        Relationships: []
-      }
-      n8n_chat_histories_regus_ab: {
-        Row: {
-          id: number
-          message: Json
-          session_id: string
-        }
-        Insert: {
-          id?: number
-          message: Json
-          session_id: string
-        }
-        Update: {
-          id?: number
-          message?: Json
-          session_id?: string
-        }
-        Relationships: []
-      }
-      n8n_chat_histories_sentimentos: {
-        Row: {
-          id: number
-          message: Json
-          session_id: string
-        }
-        Insert: {
-          id?: number
-          message: Json
-          session_id: string
-        }
-        Update: {
-          id?: number
-          message?: Json
-          session_id?: string
-        }
-        Relationships: []
-      }
-      n8n_chat_histories_service_quality: {
-        Row: {
-          id: number
-          message: Json
-          session_id: string
-        }
-        Insert: {
-          id?: number
-          message: Json
-          session_id: string
-        }
-        Update: {
-          id?: number
-          message?: Json
-          session_id?: string
-        }
-        Relationships: []
-      }
-      n8n_chat_histories_ticket360: {
-        Row: {
-          id: number
-          message: Json
-          session_id: string
-        }
-        Insert: {
-          id?: number
-          message: Json
-          session_id: string
-        }
-        Update: {
-          id?: number
-          message?: Json
-          session_id?: string
-        }
-        Relationships: []
-      }
-      n8n_chat_histories_vsd: {
-        Row: {
-          id: number
-          message: Json
-          session_id: string
-        }
-        Insert: {
-          id?: number
-          message: Json
-          session_id: string
-        }
-        Update: {
-          id?: number
-          message?: Json
-          session_id?: string
-        }
-        Relationships: []
-      }
-      n8n_chat_histories_vsd_jiu_jitsu: {
-        Row: {
-          id: number
-          message: Json
-          session_id: string
-        }
-        Insert: {
-          id?: number
-          message: Json
-          session_id: string
-        }
-        Update: {
-          id?: number
-          message?: Json
-          session_id?: string
-        }
-        Relationships: []
-      }
-      n8n_chat_histories_yupchat: {
-        Row: {
-          id: number
-          message: Json
-          session_id: string
-        }
-        Insert: {
-          id?: number
-          message: Json
-          session_id: string
-        }
-        Update: {
-          id?: number
-          message?: Json
-          session_id?: string
-        }
-        Relationships: []
-      }
-      n8n_chat_histories_zarpo: {
-        Row: {
-          id: number
-          message: Json
-          session_id: string
-        }
-        Insert: {
-          id?: number
-          message: Json
-          session_id: string
-        }
-        Update: {
-          id?: number
-          message?: Json
-          session_id?: string
-        }
-        Relationships: []
-      }
-      regus_planilha: {
-        Row: {
-          embedding: string | null
-          id: number
-          phone: string | null
-          text: string | null
-        }
-        Insert: {
-          embedding?: string | null
-          id?: number
-          phone?: string | null
-          text?: string | null
-        }
-        Update: {
-          embedding?: string | null
-          id?: number
-          phone?: string | null
-          text?: string | null
+          timestamptz?: string | null
         }
         Relationships: []
       }
     }
     Views: {
-      [_ in never]: never
+      latest_chat_per_session: {
+        Row: {
+          id: number | null
+          last_interaction: string | null
+          max_followup: number | null
+          message: Json | null
+          session_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      match_documents_coi: {
+      binary_quantize: {
+        Args: { "": string } | { "": unknown }
+        Returns: unknown
+      }
+      halfvec_avg: {
+        Args: { "": number[] }
+        Returns: unknown
+      }
+      halfvec_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      halfvec_send: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      halfvec_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
+      }
+      hnsw_bit_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnsw_halfvec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnsw_sparsevec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnswhandler: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflat_bit_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflat_halfvec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflathandler: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      l2_norm: {
+        Args: { "": unknown } | { "": unknown }
+        Returns: number
+      }
+      l2_normalize: {
+        Args: { "": string } | { "": unknown } | { "": unknown }
+        Returns: string
+      }
+      match_descricao_treinamentos_rag: {
         Args: { query_embedding: string; match_count?: number; filter?: Json }
         Returns: {
           id: number
@@ -980,7 +293,7 @@ export type Database = {
           similarity: number
         }[]
       }
-      match_documents_ecoloop: {
+      match_faq_weburn_rag: {
         Args: { query_embedding: string; match_count?: number; filter?: Json }
         Returns: {
           id: number
@@ -989,149 +302,41 @@ export type Database = {
           similarity: number
         }[]
       }
-      match_documents_family_brokers: {
-        Args: { query_embedding: string; match_count?: number; filter?: Json }
-        Returns: {
-          id: number
-          content: string
-          metadata: Json
-          similarity: number
-        }[]
+      sparsevec_out: {
+        Args: { "": unknown }
+        Returns: unknown
       }
-      match_documents_fbm: {
-        Args: { query_embedding: string; match_count?: number; filter?: Json }
-        Returns: {
-          id: number
-          content: string
-          metadata: Json
-          similarity: number
-        }[]
+      sparsevec_send: {
+        Args: { "": unknown }
+        Returns: string
       }
-      match_documents_fbm_cursos: {
-        Args: { query_embedding: string; match_count?: number; filter?: Json }
-        Returns: {
-          id: number
-          content: string
-          metadata: Json
-          similarity: number
-        }[]
+      sparsevec_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
       }
-      match_documents_fbm_suporte: {
-        Args: { query_embedding: string; match_count?: number; filter?: Json }
-        Returns: {
-          id: number
-          content: string
-          metadata: Json
-          similarity: number
-        }[]
+      vector_avg: {
+        Args: { "": number[] }
+        Returns: string
       }
-      match_documents_jf_engenharia: {
-        Args: { query_embedding: string; match_count?: number; filter?: Json }
-        Returns: {
-          id: number
-          content: string
-          metadata: Json
-          similarity: number
-        }[]
+      vector_dims: {
+        Args: { "": string } | { "": unknown }
+        Returns: number
       }
-      match_documents_paz: {
-        Args: { query_embedding: string; match_count?: number; filter?: Json }
-        Returns: {
-          id: number
-          content: string
-          metadata: Json
-          similarity: number
-        }[]
+      vector_norm: {
+        Args: { "": string }
+        Returns: number
       }
-      match_documents_petland: {
-        Args: { query_embedding: string; match_count?: number; filter?: Json }
-        Returns: {
-          id: number
-          content: string
-          metadata: Json
-          similarity: number
-        }[]
+      vector_out: {
+        Args: { "": string }
+        Returns: unknown
       }
-      match_documents_petland_sac: {
-        Args: { query_embedding: string; match_count?: number; filter?: Json }
-        Returns: {
-          id: number
-          content: string
-          metadata: Json
-          similarity: number
-        }[]
+      vector_send: {
+        Args: { "": string }
+        Returns: string
       }
-      match_documents_regus: {
-        Args: { query_embedding: string; match_count?: number; filter?: Json }
-        Returns: {
-          id: number
-          content: string
-          metadata: Json
-          similarity: number
-        }[]
-      }
-      match_documents_service_quality: {
-        Args: { query_embedding: string; match_count?: number; filter?: Json }
-        Returns: {
-          id: number
-          content: string
-          metadata: Json
-          similarity: number
-        }[]
-      }
-      match_documents_setfin: {
-        Args: { query_embedding: string; match_count?: number; filter?: Json }
-        Returns: {
-          id: number
-          content: string
-          metadata: Json
-          similarity: number
-        }[]
-      }
-      match_documents_ticket360: {
-        Args: { query_embedding: string; match_count?: number; filter?: Json }
-        Returns: {
-          id: number
-          content: string
-          metadata: Json
-          similarity: number
-        }[]
-      }
-      match_documents_vsd_jiu_jitsu: {
-        Args: { query_embedding: string; match_count?: number; filter?: Json }
-        Returns: {
-          id: number
-          content: string
-          metadata: Json
-          similarity: number
-        }[]
-      }
-      match_documents_weburn: {
-        Args: { query_embedding: string; match_count?: number; filter?: Json }
-        Returns: {
-          id: number
-          content: string
-          metadata: Json
-          similarity: number
-        }[]
-      }
-      match_documents_zarpo: {
-        Args: { query_embedding: string; match_count?: number; filter?: Json }
-        Returns: {
-          id: number
-          content: string
-          metadata: Json
-          similarity: number
-        }[]
-      }
-      match_regus_planilha: {
-        Args: { query_embedding: string; match_count?: number; filter?: Json }
-        Returns: {
-          id: number
-          content: string
-          metadata: Json
-          similarity: number
-        }[]
+      vector_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
       }
     }
     Enums: {
