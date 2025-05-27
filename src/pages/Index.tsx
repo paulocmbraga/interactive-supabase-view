@@ -1,11 +1,298 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Users, Play, Bell, Trophy, Target, CheckCircle, UserCheck, BarChart3 } from "lucide-react";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 const Index = () => {
+  // Query para buscar dados dos alunos
+  const { data: alunos, isLoading: loadingAlunos } = useQuery({
+    queryKey: ['alunos'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('alunos')
+        .select('*');
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  // Query para buscar dados de anamnese (perfilamentos)
+  const { data: anamneses, isLoading: loadingAnamneses } = useQuery({
+    queryKey: ['anamneses'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('anamnese')
+        .select('*');
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  // Query para buscar logs de visualização (plays)
+  const { data: logViews, isLoading: loadingLogs } = useQuery({
+    queryKey: ['log_views'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('log_view')
+        .select('*');
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  // Query para buscar histórico de chat (bem-vindas e lembretes)
+  const { data: chatHistories, isLoading: loadingChat } = useQuery({
+    queryKey: ['chat_histories'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('n8n_chat_histories')
+        .select('*');
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  if (loadingAlunos || loadingAnamneses || loadingLogs || loadingChat) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-xl text-gray-600">Carregando KPIs do Weburn...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Cálculos dos KPIs
+  const totalAlunos = alunos?.length || 0;
+  const alunosAtivos = alunos?.filter(aluno => aluno.plano_ativo)?.length || 0;
+  const totalPerfilamentos = anamneses?.length || 0;
+  const totalPlays = logViews?.length || 0;
+  const totalInteracoes = chatHistories?.length || 0;
+
+  // Cálculo de plays por aluno
+  const playssPorAluno = logViews?.reduce((acc, log) => {
+    const alunoId = log.aluno_id;
+    if (alunoId) {
+      acc[alunoId] = (acc[alunoId] || 0) + 1;
+    }
+    return acc;
+  }, {} as Record<number, number>) || {};
+
+  const mediaPlaysPorAluno = Object.keys(playssPorAluno).length > 0 
+    ? Object.values(playssPorAluno).reduce((a, b) => a + b, 0) / Object.keys(playssPorAluno).length 
+    : 0;
+
+  // Ranking de cursos por plays
+  const cursoRanking = logViews?.reduce((acc, log) => {
+    const curso = log.nome_curso;
+    if (curso) {
+      acc[curso] = (acc[curso] || 0) + 1;
+    }
+    return acc;
+  }, {} as Record<string, number>) || {};
+
+  const rankingData = Object.entries(cursoRanking)
+    .sort(([,a], [,b]) => b - a)
+    .slice(0, 5)
+    .map(([curso, plays]) => ({ curso, plays }));
+
+  // Dados para gráfico de engajamento
+  const engajamentoData = [
+    { name: 'Ativações', value: alunosAtivos },
+    { name: 'Perfilamentos', value: totalPerfilamentos },
+    { name: 'Plays Totais', value: totalPlays },
+    { name: 'Interações', value: totalInteracoes }
+  ];
+
+  const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
+
+  const chartConfig = {
+    plays: {
+      label: "Plays",
+      color: "#3b82f6",
+    },
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Dashboard Weburn</h1>
+          <p className="text-xl text-gray-600">Acompanhamento de KPIs e Engajamento</p>
+        </div>
+
+        {/* KPIs Principais */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">Ativações</CardTitle>
+              <CheckCircle className="h-5 w-5 text-green-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-green-600">{alunosAtivos}</div>
+              <p className="text-xs text-gray-500">de {totalAlunos} alunos totais</p>
+              <Progress value={(alunosAtivos / totalAlunos) * 100} className="mt-2" />
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">Bem-vindas</CardTitle>
+              <UserCheck className="h-5 w-5 text-blue-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-blue-600">{totalInteracoes}</div>
+              <p className="text-xs text-gray-500">interações registradas</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">Perfilamentos</CardTitle>
+              <Users className="h-5 w-5 text-purple-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-purple-600">{totalPerfilamentos}</div>
+              <p className="text-xs text-gray-500">anamneses concluídas</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">Plays Totais</CardTitle>
+              <Play className="h-5 w-5 text-orange-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-orange-600">{totalPlays}</div>
+              <p className="text-xs text-gray-500">visualizações de conteúdo</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Métricas de Engajamento */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card className="bg-white shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5 text-blue-600" />
+                Métricas de Engajamento
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium">Plays por Aluno</span>
+                <span className="text-2xl font-bold text-blue-600">{Object.keys(playssPorAluno).length}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium">Média de Plays</span>
+                <span className="text-2xl font-bold text-green-600">{mediaPlaysPorAluno.toFixed(1)}</span>
+              </div>
+              <div className="mt-4">
+                <ChartContainer config={chartConfig} className="h-[200px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={engajamentoData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={40}
+                        outerRadius={80}
+                        paddingAngle={5}
+                        dataKey="value"
+                      >
+                        {engajamentoData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Trophy className="h-5 w-5 text-yellow-600" />
+                Ranking de Cursos
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer config={chartConfig} className="h-[250px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={rankingData}>
+                    <XAxis 
+                      dataKey="curso" 
+                      fontSize={12}
+                      angle={-45}
+                      textAnchor="end"
+                      height={80}
+                    />
+                    <YAxis fontSize={12} />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Bar dataKey="plays" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Estatísticas Detalhadas */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card className="bg-white shadow-lg">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Target className="h-5 w-5 text-red-600" />
+                Taxa de Conversão
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-red-600">
+                {totalAlunos > 0 ? ((alunosAtivos / totalAlunos) * 100).toFixed(1) : 0}%
+              </div>
+              <p className="text-sm text-gray-500">de ativação de planos</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white shadow-lg">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Bell className="h-5 w-5 text-indigo-600" />
+                Engajamento Médio
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-indigo-600">
+                {totalAlunos > 0 ? (totalPlays / totalAlunos).toFixed(1) : 0}
+              </div>
+              <p className="text-sm text-gray-500">plays por aluno</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white shadow-lg">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Users className="h-5 w-5 text-teal-600" />
+                Taxa de Perfilamento
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-teal-600">
+                {totalAlunos > 0 ? ((totalPerfilamentos / totalAlunos) * 100).toFixed(1) : 0}%
+              </div>
+              <p className="text-sm text-gray-500">anamneses concluídas</p>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
