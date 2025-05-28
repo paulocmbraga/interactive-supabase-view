@@ -23,6 +23,14 @@ const DateRangeFilter = ({
   onEndDateChange, 
   onClearFilter 
 }: DateRangeFilterProps) => {
+  const setLastDays = (days: number) => {
+    const hoje = new Date();
+    const diasAtras = new Date();
+    diasAtras.setDate(hoje.getDate() - days);
+    onStartDateChange(diasAtras);
+    onEndDateChange(hoje);
+  };
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">Filtrar por Período</h3>
@@ -83,7 +91,7 @@ const DateRangeFilter = ({
 
         <div className="flex flex-col gap-2">
           <label className="text-sm font-medium text-gray-600">Ações</label>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button 
               variant="outline" 
               onClick={onClearFilter}
@@ -92,13 +100,19 @@ const DateRangeFilter = ({
               Limpar Filtro
             </Button>
             <Button 
-              onClick={() => {
-                const hoje = new Date();
-                const trintaDiasAtras = new Date();
-                trintaDiasAtras.setDate(hoje.getDate() - 30);
-                onStartDateChange(trintaDiasAtras);
-                onEndDateChange(hoje);
-              }}
+              onClick={() => setLastDays(7)}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              Últimos 7 dias
+            </Button>
+            <Button 
+              onClick={() => setLastDays(15)}
+              className="bg-orange-600 hover:bg-orange-700"
+            >
+              Últimos 15 dias
+            </Button>
+            <Button 
+              onClick={() => setLastDays(30)}
               className="bg-blue-600 hover:bg-blue-700"
             >
               Últimos 30 dias
