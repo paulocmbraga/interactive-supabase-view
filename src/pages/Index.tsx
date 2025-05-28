@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,8 +5,13 @@ import { Progress } from "@/components/ui/progress";
 import { Users, Play, Bell, Trophy, Target, CheckCircle, UserCheck, BarChart3 } from "lucide-react";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import DateRangeFilter from "@/components/DateRangeFilter";
+import React, { useState, useMemo } from "react";
 
 const Index = () => {
+  const [startDate, setStartDate] = useState<Date | undefined>();
+  const [endDate, setEndDate] = useState<Date | undefined>();
+
   // Query para buscar dados dos alunos
   const { data: alunos, isLoading: loadingAlunos } = useQuery({
     queryKey: ['alunos'],
@@ -56,6 +60,34 @@ const Index = () => {
     }
   });
 
+  // Função para filtrar dados por período
+  const filterDataByDate = (data: any[], dateField: string) => {
+    if (!data || (!startDate && !endDate)) return data;
+    
+    return data.filter(item => {
+      const itemDate = new Date(item[dateField]);
+      if (startDate && itemDate < startDate) return false;
+      if (endDate && itemDate > endDate) return false;
+      return true;
+    });
+  };
+
+  // Dados filtrados
+  const filteredAnamneses = useMemo(() => 
+    filterDataByDate(anamneses || [], 'created_at'), 
+    [anamneses, startDate, endDate]
+  );
+
+  const filteredLogViews = useMemo(() => 
+    filterDataByDate(logViews || [], 'created_at'), 
+    [logViews, startDate, endDate]
+  );
+
+  const filteredChatHistories = useMemo(() => 
+    filterDataByDate(chatHistories || [], 'timestamptz'), 
+    [chatHistories, startDate, endDate]
+  );
+
   if (loadingAlunos || loadingAnamneses || loadingLogs || loadingChat) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -67,15 +99,15 @@ const Index = () => {
     );
   }
 
-  // Cálculos dos KPIs
+  // Cálculos dos KPIs com dados filtrados
   const totalAlunos = alunos?.length || 0;
   const alunosAtivos = alunos?.filter(aluno => aluno.plano_ativo)?.length || 0;
-  const totalPerfilamentos = anamneses?.length || 0;
-  const totalPlays = logViews?.length || 0;
-  const totalInteracoes = chatHistories?.length || 0;
+  const totalPerfilamentos = filteredAnamneses?.length || 0;
+  const totalPlays = filteredLogViews?.length || 0;
+  const totalInteracoes = filteredChatHistories?.length || 0;
 
-  // Cálculo de plays por aluno
-  const playssPorAluno = logViews?.reduce((acc, log) => {
+  // Cálculo de plays por aluno com dados filtrados
+  const playssPorAluno = filteredLogViews?.reduce((acc, log) => {
     const alunoId = log.aluno_id;
     if (alunoId) {
       acc[alunoId] = (acc[alunoId] || 0) + 1;
@@ -87,8 +119,8 @@ const Index = () => {
     ? Object.values(playssPorAluno).reduce((a, b) => a + b, 0) / Object.keys(playssPorAluno).length 
     : 0;
 
-  // Ranking de cursos por plays
-  const cursoRanking = logViews?.reduce((acc, log) => {
+  // Ranking de cursos por plays com dados filtrados
+  const cursoRanking = filteredLogViews?.reduce((acc, log) => {
     const curso = log.nome_curso;
     if (curso) {
       acc[curso] = (acc[curso] || 0) + 1;
@@ -101,7 +133,7 @@ const Index = () => {
     .slice(0, 5)
     .map(([curso, plays]) => ({ curso, plays }));
 
-  // Dados para gráfico de engajamento
+  // Dados para gráfico de engajamento com dados filtrados
   const engajamentoData = [
     { name: 'Ativações', value: alunosAtivos },
     { name: 'Perfilamentos', value: totalPerfilamentos },
@@ -118,6 +150,11 @@ const Index = () => {
     },
   };
 
+  const handleClearFilter = () => {
+    setStartDate(undefined);
+    setEndDate(undefined);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -126,6 +163,25 @@ const Index = () => {
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Dashboard Weburn</h1>
           <p className="text-xl text-gray-600">Acompanhamento de KPIs e Engajamento</p>
         </div>
+
+        {/* Filtro por Período */}
+        <DateRangeFilter
+          startDate={startDate}
+          endDate={endDate}
+          onStartDateChange={setStartDate}
+          onEndDateChange={setEndDate}
+          onClearFilter={handleClearFilter}
+        />
+
+        {/* Indicador de Filtro Ativo */}
+        {(startDate || endDate) && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <p className="text-blue-800">
+              <strong>Filtro ativo:</strong> {startDate ? `de ${startDate.toLocaleDateString('pt-BR')}` : 'desde o início'} 
+              {endDate ? ` até ${endDate.toLocaleDateString('pt-BR')}` : ' até hoje'}
+            </p>
+          </div>
+        )}
 
         {/* KPIs Principais */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -289,7 +345,7 @@ const Index = () => {
               <div className="text-3xl font-bold text-teal-600">
                 {totalAlunos > 0 ? ((totalPerfilamentos / totalAlunos) * 100).toFixed(1) : 0}%
               </div>
-              <p className="text-sm text-gray-500">anamneses concluídas</p>
+              <p className="text-xs text-gray-500">anamneses concluídas</p>
             </CardContent>
           </Card>
         </div>

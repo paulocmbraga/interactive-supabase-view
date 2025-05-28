@@ -218,11 +218,13 @@ export type Database = {
     Views: {
       latest_chat_per_session: {
         Row: {
+          followup: number | null
           id: number | null
           last_interaction: string | null
           max_followup: number | null
           message: Json | null
           session_id: string | null
+          ultimo_followup: string | null
         }
         Relationships: []
       }
