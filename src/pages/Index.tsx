@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -109,29 +110,29 @@ const Index = () => {
   // Cálculo de plays por aluno com dados filtrados
   const playssPorAluno = filteredLogViews?.reduce((acc, log) => {
     const alunoId = log.aluno_id;
-    if (alunoId) {
+    if (alunoId && typeof alunoId === 'number') {
       acc[alunoId] = (acc[alunoId] || 0) + 1;
     }
     return acc;
   }, {} as Record<number, number>) || {};
 
   const mediaPlaysPorAluno = Object.keys(playssPorAluno).length > 0 
-    ? Object.values(playssPorAluno).reduce((a, b) => a + b, 0) / Object.keys(playssPorAluno).length 
+    ? Number((Object.values(playssPorAluno).reduce((a, b) => Number(a) + Number(b), 0) / Object.keys(playssPorAluno).length).toFixed(1))
     : 0;
 
   // Ranking de cursos por plays com dados filtrados
   const cursoRanking = filteredLogViews?.reduce((acc, log) => {
     const curso = log.nome_curso;
-    if (curso) {
+    if (curso && typeof curso === 'string') {
       acc[curso] = (acc[curso] || 0) + 1;
     }
     return acc;
   }, {} as Record<string, number>) || {};
 
   const rankingData = Object.entries(cursoRanking)
-    .sort(([,a], [,b]) => b - a)
+    .sort(([,a], [,b]) => Number(b) - Number(a))
     .slice(0, 5)
-    .map(([curso, plays]) => ({ curso, plays }));
+    .map(([curso, plays]) => ({ curso, plays: Number(plays) }));
 
   // Dados para gráfico de engajamento com dados filtrados
   const engajamentoData = [
@@ -247,7 +248,7 @@ const Index = () => {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm font-medium">Média de Plays</span>
-                <span className="text-2xl font-bold text-green-600">{mediaPlaysPorAluno.toFixed(1)}</span>
+                <span className="text-2xl font-bold text-green-600">{mediaPlaysPorAluno}</span>
               </div>
               <div className="mt-4">
                 <ChartContainer config={chartConfig} className="h-[200px]">
