@@ -1,11 +1,10 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Users, Play, Bell, Trophy, Target, CheckCircle, UserCheck, BarChart3 } from "lucide-react";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegendContent } from "@/components/ui/chart";
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 import DateRangeFilter from "@/components/DateRangeFilter";
 import React, { useState, useMemo } from "react";
 
@@ -149,10 +148,16 @@ const Index = () => {
     return acc;
   }, {} as Record<string, number>) || {};
 
+  const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+
   const rankingData = Object.entries(cursoRanking)
     .sort(([,a], [,b]) => (b as number) - (a as number))
     .slice(0, 5)
-    .map(([curso, plays]) => ({ curso, plays: plays as number }));
+    .map(([curso, plays], index) => ({
+      curso,
+      plays: plays as number,
+      color: COLORS[index % COLORS.length],
+    }));
 
   // Dados para gráfico de engajamento com dados filtrados
   const engajamentoData = [
@@ -161,8 +166,6 @@ const Index = () => {
     { name: 'Plays Totais', value: totalPlays },
     { name: 'Interações', value: totalInteracoes }
   ];
-
-  const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
 
   const chartConfig = {
     plays: {
@@ -181,8 +184,8 @@ const Index = () => {
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Dashboard Weburn</h1>
-          <p className="text-xl text-gray-600">Acompanhamento de KPIs e Engajamento</p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Agente Onboarding | Sérgio Bertolucci</h1>
+          <p className="text-xl text-gray-600">Acompanhamento de Onboarding</p>
         </div>
 
         {/* Filtro por Período */}
@@ -214,7 +217,7 @@ const Index = () => {
             <CardContent>
               <div className="text-3xl font-bold text-green-600">{alunosAtivos}</div>
               <p className="text-xs text-gray-500">de {totalAlunos} alunos totais</p>
-              <Progress value={(alunosAtivos / totalAlunos) * 100} className="mt-2" />
+              <Progress value={(alunosAtivos / totalAlunos) * 100} className="mt-2" indicatorClassName="bg-green-600" />
             </CardContent>
           </Card>
 
@@ -250,52 +253,8 @@ const Index = () => {
               <p className="text-xs text-gray-500">visualizações de conteúdo</p>
             </CardContent>
           </Card>
-        </div>
 
-        {/* Métricas de Engajamento */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="bg-white shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5 text-blue-600" />
-                Métricas de Engajamento
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">Plays por Aluno</span>
-                <span className="text-2xl font-bold text-blue-600">{Object.keys(playssPorAluno).length}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">Média de Plays</span>
-                <span className="text-2xl font-bold text-green-600">{mediaPlaysPorAluno}</span>
-              </div>
-              <div className="mt-4">
-                <ChartContainer config={chartConfig} className="h-[200px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={engajamentoData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={40}
-                        outerRadius={80}
-                        paddingAngle={5}
-                        dataKey="value"
-                      >
-                        {engajamentoData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white shadow-lg">
+          <Card className="bg-white shadow-lg lg:col-span-4">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Trophy className="h-5 w-5 text-yellow-600" />
@@ -303,19 +262,33 @@ const Index = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ChartContainer config={chartConfig} className="h-[250px]">
+              <ChartContainer config={chartConfig} className="h-[350px] w-full pb-4">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={rankingData}>
-                    <XAxis 
-                      dataKey="curso" 
-                      fontSize={12}
-                      angle={-45}
-                      textAnchor="end"
-                      height={80}
-                    />
+                  <BarChart data={rankingData} margin={{ bottom: 20 }}>
                     <YAxis fontSize={12} />
                     <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar dataKey="plays" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="plays" radius={[4, 4, 0, 0]}>
+                      {rankingData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Bar>
+                    <Legend 
+                      content={({ payload }) => (
+                        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 md:pl-4 lg:pl-8" style={{ marginTop: '30px' }}>
+                          {rankingData.map((entry, index) => (
+                            <div key={`legend-${index}`} className="flex items-center gap-2">
+                              <div 
+                                className="h-3 w-3"
+                                style={{
+                                  backgroundColor: entry.color,
+                                }}
+                              ></div>
+                              <span className="text-sm text-gray-700">{entry.curso}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               </ChartContainer>
@@ -334,9 +307,9 @@ const Index = () => {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-red-600">
-                {totalAlunos > 0 ? ((alunosAtivos / totalAlunos) * 100).toFixed(1) : 0}%
+                {totalAlunos > 0 ? ((Object.keys(playssPorAluno).length / totalAlunos) * 100).toFixed(1) : 0}%
               </div>
-              <p className="text-sm text-gray-500">de ativação de planos</p>
+              <p className="text-sm text-gray-500">de alunos com plays</p>
             </CardContent>
           </Card>
 
@@ -349,7 +322,7 @@ const Index = () => {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-indigo-600">
-                {totalAlunos > 0 ? (totalPlays / totalAlunos).toFixed(1) : 0}
+                {mediaPlaysPorAluno}
               </div>
               <p className="text-sm text-gray-500">plays por aluno</p>
             </CardContent>
@@ -359,7 +332,7 @@ const Index = () => {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Users className="h-5 w-5 text-teal-600" />
-                Taxa de Perfilamento
+                Média de Recomendações
               </CardTitle>
             </CardHeader>
             <CardContent>

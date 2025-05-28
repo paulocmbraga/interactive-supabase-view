@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -42,7 +41,7 @@ const DateRangeFilter = ({
               <Button
                 variant="outline"
                 className={cn(
-                  "w-[200px] justify-start text-left font-normal",
+                  "w-full md:w-auto justify-start text-left font-normal",
                   !startDate && "text-muted-foreground"
                 )}
               >
@@ -69,7 +68,7 @@ const DateRangeFilter = ({
               <Button
                 variant="outline"
                 className={cn(
-                  "w-[200px] justify-start text-left font-normal",
+                  "w-full md:w-auto justify-start text-left font-normal",
                   !endDate && "text-muted-foreground"
                 )}
               >
@@ -116,6 +115,12 @@ const DateRangeFilter = ({
               className="bg-blue-600 hover:bg-blue-700"
             >
               Últimos 30 dias
+            </Button>
+            <Button 
+              onClick={() => setLastDays(90)}
+              style={{ backgroundColor: 'rgb(245, 158, 11)', color: 'white' }}
+            >
+              Últimos 90 dias
             </Button>
           </div>
         </div>
