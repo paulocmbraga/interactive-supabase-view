@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,7 +35,8 @@ const Index = () => {
         .from('anamnese')
         .select('*');
       if (error) throw error;
-      console.log("Dados das anamneses:", data);
+      console.log("Dados das anamneses (TODOS):", data);
+      console.log("Quantidade total de anamneses no banco:", data?.length || 0);
       return data;
     }
   });
@@ -82,7 +82,9 @@ const Index = () => {
   // Dados filtrados
   const filteredAnamneses = useMemo(() => {
     const filtered = filterDataByDate(anamneses || [], 'created_at');
-    console.log("Anamneses filtradas:", filtered);
+    console.log("Anamneses ANTES do filtro:", anamneses?.length || 0);
+    console.log("Anamneses DEPOIS do filtro:", filtered?.length || 0);
+    console.log("Anamneses filtradas (detalhes):", filtered);
     return filtered;
   }, [anamneses, startDate, endDate]);
 
@@ -134,7 +136,7 @@ const Index = () => {
   }, {} as Record<number, number>) || {};
 
   const mediaPlaysPorAluno = Object.keys(playssPorAluno).length > 0 
-    ? Number((Object.values(playssPorAluno).reduce((a, b) => a + b, 0) / Object.keys(playssPorAluno).length).toFixed(1))
+    ? Number((Object.values(playssPorAluno).reduce((a: number, b: number) => a + b, 0) / Object.keys(playssPorAluno).length).toFixed(1))
     : 0;
 
   // Ranking de cursos por plays com dados filtrados
@@ -147,9 +149,9 @@ const Index = () => {
   }, {} as Record<string, number>) || {};
 
   const rankingData = Object.entries(cursoRanking)
-    .sort(([,a], [,b]) => b - a)
+    .sort(([,a], [,b]) => (b as number) - (a as number))
     .slice(0, 5)
-    .map(([curso, plays]) => ({ curso, plays }));
+    .map(([curso, plays]) => ({ curso, plays: plays as number }));
 
   // Dados para gráfico de engajamento com dados filtrados
   const engajamentoData = [
