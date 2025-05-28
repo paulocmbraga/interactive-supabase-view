@@ -13,6 +13,8 @@ const Index = () => {
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
 
+  console.log("Filtros ativos:", { startDate, endDate });
+
   // Query para buscar dados dos alunos
   const { data: alunos, isLoading: loadingAlunos } = useQuery({
     queryKey: ['alunos'],
@@ -21,6 +23,7 @@ const Index = () => {
         .from('alunos')
         .select('*');
       if (error) throw error;
+      console.log("Dados dos alunos:", data);
       return data;
     }
   });
@@ -33,6 +36,7 @@ const Index = () => {
         .from('anamnese')
         .select('*');
       if (error) throw error;
+      console.log("Dados das anamneses:", data);
       return data;
     }
   });
@@ -45,6 +49,7 @@ const Index = () => {
         .from('log_view')
         .select('*');
       if (error) throw error;
+      console.log("Dados dos log_views:", data);
       return data;
     }
   });
@@ -57,6 +62,7 @@ const Index = () => {
         .from('n8n_chat_histories')
         .select('*');
       if (error) throw error;
+      console.log("Dados do chat histories:", data);
       return data;
     }
   });
@@ -74,20 +80,23 @@ const Index = () => {
   };
 
   // Dados filtrados
-  const filteredAnamneses = useMemo(() => 
-    filterDataByDate(anamneses || [], 'created_at'), 
-    [anamneses, startDate, endDate]
-  );
+  const filteredAnamneses = useMemo(() => {
+    const filtered = filterDataByDate(anamneses || [], 'created_at');
+    console.log("Anamneses filtradas:", filtered);
+    return filtered;
+  }, [anamneses, startDate, endDate]);
 
-  const filteredLogViews = useMemo(() => 
-    filterDataByDate(logViews || [], 'created_at'), 
-    [logViews, startDate, endDate]
-  );
+  const filteredLogViews = useMemo(() => {
+    const filtered = filterDataByDate(logViews || [], 'created_at');
+    console.log("Log views filtrados:", filtered);
+    return filtered;
+  }, [logViews, startDate, endDate]);
 
-  const filteredChatHistories = useMemo(() => 
-    filterDataByDate(chatHistories || [], 'timestamptz'), 
-    [chatHistories, startDate, endDate]
-  );
+  const filteredChatHistories = useMemo(() => {
+    const filtered = filterDataByDate(chatHistories || [], 'timestamptz');
+    console.log("Chat histories filtrados:", filtered);
+    return filtered;
+  }, [chatHistories, startDate, endDate]);
 
   if (loadingAlunos || loadingAnamneses || loadingLogs || loadingChat) {
     return (
@@ -107,6 +116,14 @@ const Index = () => {
   const totalPlays = filteredLogViews?.length || 0;
   const totalInteracoes = filteredChatHistories?.length || 0;
 
+  console.log("KPIs calculados:", {
+    totalAlunos,
+    alunosAtivos,
+    totalPerfilamentos,
+    totalPlays,
+    totalInteracoes
+  });
+
   // Cálculo de plays por aluno com dados filtrados
   const playssPorAluno = filteredLogViews?.reduce((acc, log) => {
     const alunoId = log.aluno_id;
@@ -117,7 +134,7 @@ const Index = () => {
   }, {} as Record<number, number>) || {};
 
   const mediaPlaysPorAluno = Object.keys(playssPorAluno).length > 0 
-    ? Number((Object.values(playssPorAluno).reduce((a, b) => Number(a) + Number(b), 0) / Object.keys(playssPorAluno).length).toFixed(1))
+    ? Number((Object.values(playssPorAluno).reduce((a, b) => a + b, 0) / Object.keys(playssPorAluno).length).toFixed(1))
     : 0;
 
   // Ranking de cursos por plays com dados filtrados
@@ -130,9 +147,9 @@ const Index = () => {
   }, {} as Record<string, number>) || {};
 
   const rankingData = Object.entries(cursoRanking)
-    .sort(([,a], [,b]) => Number(b) - Number(a))
+    .sort(([,a], [,b]) => b - a)
     .slice(0, 5)
-    .map(([curso, plays]) => ({ curso, plays: Number(plays) }));
+    .map(([curso, plays]) => ({ curso, plays }));
 
   // Dados para gráfico de engajamento com dados filtrados
   const engajamentoData = [
