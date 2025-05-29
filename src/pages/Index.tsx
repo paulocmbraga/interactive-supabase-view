@@ -188,7 +188,7 @@ const Index = () => {
             <img 
               src="/sergio.png" 
               alt="Sérgio Bertoluci" 
-              className="h-24 w-24 md:h-32 md:w-32 object-cover"
+              className="h-32 w-32 md:h-32 md:w-32 object-cover"
             />
             <div className="hidden md:block">
               <h2 className="text-xl md:text-2xl font-semibold text-[#00ff88]">Sérgio Bertoluci</h2>
@@ -196,7 +196,7 @@ const Index = () => {
             <img 
               src="/logo.webp" 
               alt="Weburn Logo" 
-              className="h-12 w-auto md:hidden"
+              className="h-16 w-auto md:hidden"
             />
           </div>
           <div className="flex-1 text-center order-first md:order-none">
