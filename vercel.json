@@ -1,4 +1,5 @@
 {
+  // Configuração do Vercel para build e deploy
   "buildCommand": "npm run build:vercel",
   "outputDirectory": "dist",
   "framework": "vite",
