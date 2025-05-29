@@ -31,94 +31,94 @@ const DateRangeFilter = ({
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Filtrar por Período</h3>
+    <div className="bg-[#2d2d2d] border border-[#3d3d3d] p-6 rounded-lg shadow-lg">
+      <h3 className="text-lg font-semibold text-gray-300 mb-4">Filtrar por Período</h3>
       <div className="flex flex-wrap items-center gap-4">
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-600">Data Inicial</label>
+          <label className="text-sm font-medium text-gray-300">Data Inicial</label>
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
                 className={cn(
-                  "w-full md:w-auto justify-start text-left font-normal",
-                  !startDate && "text-muted-foreground"
+                  "w-full md:w-auto justify-start text-left font-normal bg-[#1a1a1a] border-[#3d3d3d] text-gray-300 hover:bg-[#3d3d3d]",
+                  !startDate && "text-gray-400"
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {startDate ? format(startDate, "dd/MM/yyyy", { locale: ptBR }) : "Selecionar data"}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
+            <PopoverContent className="w-auto p-0 bg-[#2d2d2d] border-[#3d3d3d]" align="start">
               <Calendar
                 mode="single"
                 selected={startDate}
                 onSelect={onStartDateChange}
                 initialFocus
-                className="pointer-events-auto"
+                className="pointer-events-auto text-gray-300"
               />
             </PopoverContent>
           </Popover>
         </div>
 
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-600">Data Final</label>
+          <label className="text-sm font-medium text-gray-300">Data Final</label>
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
                 className={cn(
-                  "w-full md:w-auto justify-start text-left font-normal",
-                  !endDate && "text-muted-foreground"
+                  "w-full md:w-auto justify-start text-left font-normal bg-[#1a1a1a] border-[#3d3d3d] text-gray-300 hover:bg-[#3d3d3d]",
+                  !endDate && "text-gray-400"
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {endDate ? format(endDate, "dd/MM/yyyy", { locale: ptBR }) : "Selecionar data"}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
+            <PopoverContent className="w-auto p-0 bg-[#2d2d2d] border-[#3d3d3d]" align="start">
               <Calendar
                 mode="single"
                 selected={endDate}
                 onSelect={onEndDateChange}
                 initialFocus
-                className="pointer-events-auto"
+                className="pointer-events-auto text-gray-300"
               />
             </PopoverContent>
           </Popover>
         </div>
 
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-600">Ações</label>
+          <label className="text-sm font-medium text-gray-300">Ações</label>
           <div className="flex flex-wrap gap-2">
             <Button 
               variant="outline" 
               onClick={onClearFilter}
-              className="text-gray-600"
+              className="text-gray-300 border-[#3d3d3d] hover:bg-[#3d3d3d]"
             >
               Limpar Filtro
             </Button>
             <Button 
               onClick={() => setLastDays(7)}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-[#00ff88] hover:bg-[#00cc6a] text-black"
             >
               Últimos 7 dias
             </Button>
             <Button 
               onClick={() => setLastDays(15)}
-              className="bg-orange-600 hover:bg-orange-700"
+              className="bg-[#ff8800] hover:bg-[#cc6a00] text-black"
             >
               Últimos 15 dias
             </Button>
             <Button 
               onClick={() => setLastDays(30)}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-[#00b4ff] hover:bg-[#0099cc] text-black"
             >
               Últimos 30 dias
             </Button>
             <Button 
               onClick={() => setLastDays(90)}
-              style={{ backgroundColor: 'rgb(245, 158, 11)', color: 'white' }}
+              className="bg-[#ff00ff] hover:bg-[#cc00cc] text-black"
             >
               Últimos 90 dias
             </Button>

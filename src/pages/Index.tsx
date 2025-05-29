@@ -180,12 +180,30 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-[#1a1a1a] to-[#2d2d2d] p-6">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Agente Onboarding | Sérgio Bertolucci</h1>
-          <p className="text-xl text-gray-600">Acompanhamento de Onboarding</p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <img 
+              src="/sergio.png" 
+              alt="Sérgio Bertoluci" 
+              className="h-32 w-32 object-cover"
+            />
+            <div>
+              <h2 className="text-2xl font-semibold text-[#00ff88]">Sérgio Bertoluci</h2>
+            </div>
+          </div>
+          <div className="flex-1 text-center">
+            <h1 className="text-4xl font-bold text-white">Agente Onboarding</h1>
+          </div>
+          <div className="flex items-center gap-4">
+            <img 
+              src="/logo.webp" 
+              alt="Weburn Logo" 
+              className="h-16 w-auto"
+            />
+          </div>
         </div>
 
         {/* Filtro por Período */}
@@ -199,8 +217,8 @@ const Index = () => {
 
         {/* Indicador de Filtro Ativo */}
         {(startDate || endDate) && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <p className="text-blue-800">
+          <div className="bg-[#2d2d2d] border border-[#3d3d3d] rounded-lg p-4 mt-6">
+            <p className="text-gray-300">
               <strong>Filtro ativo:</strong> {startDate ? `de ${startDate.toLocaleDateString('pt-BR')}` : 'desde o início'} 
               {endDate ? ` até ${endDate.toLocaleDateString('pt-BR')}` : ' até hoje'}
             </p>
@@ -208,56 +226,56 @@ const Index = () => {
         )}
 
         {/* KPIs Principais */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+          <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Ativações</CardTitle>
-              <CheckCircle className="h-5 w-5 text-green-600" />
+              <CardTitle className="text-sm font-medium text-gray-300">Ativações</CardTitle>
+              <CheckCircle className="h-5 w-5 text-[#00ff88]" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-green-600">{alunosAtivos}</div>
-              <p className="text-xs text-gray-500">de {totalAlunos} alunos totais</p>
-              <Progress value={(alunosAtivos / totalAlunos) * 100} className="mt-2" indicatorClassName="bg-green-600" />
+              <div className="text-3xl font-bold text-[#00ff88]">{alunosAtivos}</div>
+              <p className="text-xs text-gray-400">de {totalAlunos} alunos totais</p>
+              <Progress value={(alunosAtivos / totalAlunos) * 100} className="mt-2" indicatorClassName="bg-[#00ff88]" />
             </CardContent>
           </Card>
 
-          <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow">
+          <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Bem-vindas</CardTitle>
-              <UserCheck className="h-5 w-5 text-blue-600" />
+              <CardTitle className="text-sm font-medium text-gray-300">Bem-vindas</CardTitle>
+              <UserCheck className="h-5 w-5 text-[#00b4ff]" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-blue-600">{totalInteracoes}</div>
-              <p className="text-xs text-gray-500">interações registradas</p>
+              <div className="text-3xl font-bold text-[#00b4ff]">{totalInteracoes}</div>
+              <p className="text-xs text-gray-400">interações registradas</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow">
+          <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Perfilamentos</CardTitle>
-              <Users className="h-5 w-5 text-purple-600" />
+              <CardTitle className="text-sm font-medium text-gray-300">Perfilamentos</CardTitle>
+              <Users className="h-5 w-5 text-[#ff00ff]" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-purple-600">{totalPerfilamentos}</div>
-              <p className="text-xs text-gray-500">anamneses concluídas</p>
+              <div className="text-3xl font-bold text-[#ff00ff]">{totalPerfilamentos}</div>
+              <p className="text-xs text-gray-400">anamneses concluídas</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow">
+          <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Plays Totais</CardTitle>
-              <Play className="h-5 w-5 text-orange-600" />
+              <CardTitle className="text-sm font-medium text-gray-300">Plays Totais</CardTitle>
+              <Play className="h-5 w-5 text-[#ff8800]" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-orange-600">{totalPlays}</div>
-              <p className="text-xs text-gray-500">visualizações de conteúdo</p>
+              <div className="text-3xl font-bold text-[#ff8800]">{totalPlays}</div>
+              <p className="text-xs text-gray-400">visualizações de conteúdo</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-white shadow-lg lg:col-span-4">
+          <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg lg:col-span-4">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Trophy className="h-5 w-5 text-yellow-600" />
+              <CardTitle className="flex items-center gap-2 text-gray-300">
+                <Trophy className="h-5 w-5 text-[#ffd700]" />
                 Ranking de Cursos
               </CardTitle>
             </CardHeader>
@@ -265,7 +283,7 @@ const Index = () => {
               <ChartContainer config={chartConfig} className="h-[350px] w-full pb-4">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={rankingData} margin={{ bottom: 20 }}>
-                    <YAxis fontSize={12} />
+                    <YAxis fontSize={12} stroke="#666" />
                     <ChartTooltip content={<ChartTooltipContent />} />
                     <Bar dataKey="plays" radius={[4, 4, 0, 0]}>
                       {rankingData.map((entry, index) => (
@@ -283,7 +301,7 @@ const Index = () => {
                                   backgroundColor: entry.color,
                                 }}
                               ></div>
-                              <span className="text-sm text-gray-700">{entry.curso}</span>
+                              <span className="text-sm text-gray-300">{entry.curso}</span>
                             </div>
                           ))}
                         </div>
@@ -297,49 +315,49 @@ const Index = () => {
         </div>
 
         {/* Estatísticas Detalhadas */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="bg-white shadow-lg">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+          <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg">
             <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Target className="h-5 w-5 text-red-600" />
+              <CardTitle className="text-lg flex items-center gap-2 text-gray-300">
+                <Target className="h-5 w-5 text-[#ff4444]" />
                 Taxa de Conversão
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-red-600">
+              <div className="text-3xl font-bold text-[#ff4444]">
                 {totalAlunos > 0 ? ((Object.keys(playssPorAluno).length / totalAlunos) * 100).toFixed(1) : 0}%
               </div>
-              <p className="text-sm text-gray-500">de alunos com plays</p>
+              <p className="text-sm text-gray-400">de alunos com plays</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-white shadow-lg">
+          <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg">
             <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Bell className="h-5 w-5 text-indigo-600" />
+              <CardTitle className="text-lg flex items-center gap-2 text-gray-300">
+                <Bell className="h-5 w-5 text-[#8844ff]" />
                 Engajamento Médio
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-indigo-600">
+              <div className="text-3xl font-bold text-[#8844ff]">
                 {mediaPlaysPorAluno}
               </div>
-              <p className="text-sm text-gray-500">plays por aluno</p>
+              <p className="text-sm text-gray-400">plays por aluno</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-white shadow-lg">
+          <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg">
             <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Users className="h-5 w-5 text-teal-600" />
+              <CardTitle className="text-lg flex items-center gap-2 text-gray-300">
+                <Users className="h-5 w-5 text-[#44ff88]" />
                 Média de Recomendações
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-teal-600">
+              <div className="text-3xl font-bold text-[#44ff88]">
                 {totalAlunos > 0 ? ((totalPerfilamentos / totalAlunos) * 100).toFixed(1) : 0}%
               </div>
-              <p className="text-xs text-gray-500">anamneses concluídas</p>
+              <p className="text-xs text-gray-400">anamneses concluídas</p>
             </CardContent>
           </Card>
         </div>
