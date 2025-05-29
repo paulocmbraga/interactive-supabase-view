@@ -33,71 +33,68 @@ const DateRangeFilter = ({
   return (
     <div className="bg-[#2d2d2d] border border-[#3d3d3d] p-6 rounded-lg shadow-lg">
       <h3 className="text-lg font-semibold text-gray-300 mb-4">Filtrar por Período</h3>
-      <div className="flex flex-wrap items-center gap-4">
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-300">Data Inicial</label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-full md:w-auto justify-start text-left font-normal bg-[#1a1a1a] border-[#3d3d3d] text-gray-300 hover:bg-[#3d3d3d]",
-                  !startDate && "text-gray-400"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {startDate ? format(startDate, "dd/MM/yyyy", { locale: ptBR }) : "Selecionar data"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 bg-[#2d2d2d] border-[#3d3d3d]" align="start">
-              <Calendar
-                mode="single"
-                selected={startDate}
-                onSelect={onStartDateChange}
-                initialFocus
-                className="pointer-events-auto text-gray-300"
-              />
-            </PopoverContent>
-          </Popover>
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 mt-6">
+        <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
+          <div className="w-full md:w-[200px]">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal bg-[#1a1a1a] border-[#3d3d3d] text-gray-300 hover:bg-[#3d3d3d]",
+                    !startDate && "text-gray-400"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {startDate ? format(startDate, "dd/MM/yyyy", { locale: ptBR }) : "Selecionar data"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 bg-[#2d2d2d] border-[#3d3d3d]" align="start">
+                <Calendar
+                  mode="single"
+                  selected={startDate}
+                  onSelect={onStartDateChange}
+                  initialFocus
+                  className="pointer-events-auto text-gray-300"
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+          <div className="w-full md:w-[200px]">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal bg-[#1a1a1a] border-[#3d3d3d] text-gray-300 hover:bg-[#3d3d3d]",
+                    !endDate && "text-gray-400"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {endDate ? format(endDate, "dd/MM/yyyy", { locale: ptBR }) : "Selecionar data"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 bg-[#2d2d2d] border-[#3d3d3d]" align="start">
+                <Calendar
+                  mode="single"
+                  selected={endDate}
+                  onSelect={onEndDateChange}
+                  initialFocus
+                  className="pointer-events-auto text-gray-300"
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
-
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-300">Data Final</label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-full md:w-auto justify-start text-left font-normal bg-[#1a1a1a] border-[#3d3d3d] text-gray-300 hover:bg-[#3d3d3d]",
-                  !endDate && "text-gray-400"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {endDate ? format(endDate, "dd/MM/yyyy", { locale: ptBR }) : "Selecionar data"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 bg-[#2d2d2d] border-[#3d3d3d]" align="start">
-              <Calendar
-                mode="single"
-                selected={endDate}
-                onSelect={onEndDateChange}
-                initialFocus
-                className="pointer-events-auto text-gray-300"
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-300">Ações</label>
-          <div className="flex flex-wrap gap-2">
-            <Button 
-              variant="outline" 
-              onClick={onClearFilter}
-              className="text-gray-300 border-[#3d3d3d] hover:bg-[#3d3d3d]"
-            >
-              Limpar Filtro
-            </Button>
+        <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
+          <Button
+            variant="outline"
+            onClick={onClearFilter}
+            className="w-full md:w-auto"
+          >
+            Limpar Filtro
+          </Button>
+          <div className="hidden md:flex flex-wrap gap-2">
             <Button 
               onClick={() => setLastDays(7)}
               className="bg-[#00ff88] hover:bg-[#00cc6a] text-black"
