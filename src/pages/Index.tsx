@@ -200,7 +200,10 @@ const Index = () => {
             />
           </div>
           <div className="flex-1 text-center order-first md:order-none">
-            <h1 className="text-2xl md:text-4xl font-bold text-white">Agente Onboarding</h1>
+            <div className="flex flex-col md:block items-center gap-2">
+              <h1 className="text-2xl md:text-4xl font-bold text-white">Agente Onboarding</h1>
+              <h2 className="text-lg md:hidden font-semibold text-[#00ff88]">Sérgio Bertoluci</h2>
+            </div>
           </div>
           <div className="hidden md:flex items-center gap-4">
             <img 
