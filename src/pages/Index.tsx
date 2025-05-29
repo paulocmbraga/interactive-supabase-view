@@ -190,14 +190,19 @@ const Index = () => {
               alt="Sérgio Bertoluci" 
               className="h-24 w-24 md:h-32 md:w-32 object-cover"
             />
-            <div>
+            <div className="hidden md:block">
               <h2 className="text-xl md:text-2xl font-semibold text-[#00ff88]">Sérgio Bertoluci</h2>
             </div>
+            <img 
+              src="/logo.webp" 
+              alt="Weburn Logo" 
+              className="h-12 w-auto md:hidden"
+            />
           </div>
           <div className="flex-1 text-center order-first md:order-none">
             <h1 className="text-2xl md:text-4xl font-bold text-white">Agente Onboarding</h1>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-4">
             <img 
               src="/logo.webp" 
               alt="Weburn Logo" 
