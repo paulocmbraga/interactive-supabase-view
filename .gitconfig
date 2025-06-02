@@ -1,0 +1,8 @@
+[user]
+    name = Paulo Braga
+    email = paulocbraga@yahoo.com.br
+[commit]
+    author = Paulo Braga <paulocbraga@yahoo.com.br>
+[core]
+    autocrlf = input
+    safecrlf = true 
