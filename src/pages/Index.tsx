@@ -58,12 +58,29 @@ const Index = () => {
   const { data: chatHistories, isLoading: loadingChat } = useQuery({
     queryKey: ['chat_histories'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Buscar dados do chat
+      const { data: chatData, error: chatError } = await supabase
         .from('n8n_chat_histories')
         .select('*');
-      if (error) throw error;
-      console.log("Dados do chat histories:", data);
-      return data;
+      if (chatError) throw chatError;
+
+      // Buscar dados dos alunos
+      const { data: alunosData, error: alunosError } = await supabase
+        .from('alunos')
+        .select('*');
+      if (alunosError) throw alunosError;
+
+      // Fazer o join no cliente
+      const joinedData = chatData.map(chat => {
+        const aluno = alunosData.find(a => a.yupchat_id === chat.session_id);
+        return {
+          ...chat,
+          aluno: aluno || null
+        };
+      });
+
+      console.log("Dados do chat histories com join:", joinedData);
+      return joinedData;
     }
   });
 
@@ -90,9 +107,12 @@ const Index = () => {
 
   const filteredLogViews = useMemo(() => {
     const filtered = filterDataByDate(logViews || [], 'created_at');
-    console.log("Log views filtrados:", filtered);
-    return filtered;
-  }, [logViews, startDate, endDate]);
+    // Filtrar apenas os plays dos alunos que têm interações no chat
+    const alunosComChat = new Set(chatHistories?.map(chat => chat.aluno?.aluno_id).filter(Boolean));
+    const filteredByChat = filtered.filter(log => alunosComChat.has(log.aluno_id));
+    console.log("Log views filtrados:", filteredByChat);
+    return filteredByChat;
+  }, [logViews, startDate, endDate, chatHistories]);
 
   const filteredChatHistories = useMemo(() => {
     const filtered = filterDataByDate(chatHistories || [], 'timestamptz');
@@ -113,7 +133,14 @@ const Index = () => {
 
   // Cálculos dos KPIs com dados filtrados
   const totalAlunos = alunos?.length || 0;
-  const alunosAtivos = alunos?.filter(aluno => aluno.plano_ativo)?.length || 0;
+  
+  // Filtrar alunos ativos que têm interações no chat
+  const alunosAtivosComChat = alunos?.filter(aluno => {
+    const temChat = chatHistories?.some(chat => chat.aluno?.aluno_id === aluno.aluno_id);
+    return aluno.plano_ativo && temChat;
+  }) || [];
+  
+  const alunosAtivos = alunosAtivosComChat.length;
   const totalPerfilamentos = filteredAnamneses?.length || 0;
   const totalPlays = filteredLogViews?.length || 0;
   const totalInteracoes = new Set(filteredChatHistories?.map(chat => chat.session_id)).size || 0;
@@ -123,7 +150,8 @@ const Index = () => {
     alunosAtivos,
     totalPerfilamentos,
     totalPlays,
-    totalInteracoes
+    totalInteracoes,
+    alunosAtivosComChat: alunosAtivosComChat.length
   });
 
   // Cálculo de plays por aluno com dados filtrados
@@ -135,8 +163,19 @@ const Index = () => {
     return acc;
   }, {} as Record<number, number>) || {};
 
+  // Calcular taxa de conversão apenas para alunos com chat
+  const alunosComPlays = Object.keys(playssPorAluno).length;
+  const taxaConversao = alunosAtivos > 0 
+    ? ((alunosComPlays / alunosAtivos) * 100).toFixed(1)
+    : 0;
+
   const mediaPlaysPorAluno = Object.keys(playssPorAluno).length > 0 
     ? Number((Object.values(playssPorAluno).reduce((a: number, b: number) => a + b, 0) / Object.keys(playssPorAluno).length).toFixed(1))
+    : 0;
+
+  // Calcular média de recomendações apenas para alunos com chat
+  const mediaRecomendacoes = alunosAtivos > 0 
+    ? ((totalPerfilamentos / alunosAtivos) * 100).toFixed(1)
     : 0;
 
   // Ranking de cursos por plays com dados filtrados
@@ -335,7 +374,7 @@ const Index = () => {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-[#ff4444]">
-                {totalAlunos > 0 ? ((Object.keys(playssPorAluno).length / totalAlunos) * 100).toFixed(1) : 0}%
+                {taxaConversao}%
               </div>
               <p className="text-sm text-gray-400">de alunos com plays</p>
             </CardContent>
@@ -365,7 +404,7 @@ const Index = () => {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-[#44ff88]">
-                {totalAlunos > 0 ? ((totalPerfilamentos / totalAlunos) * 100).toFixed(1) : 0}%
+                {mediaRecomendacoes}%
               </div>
               <p className="text-xs text-gray-400">anamneses concluídas</p>
             </CardContent>
