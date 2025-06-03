@@ -116,7 +116,7 @@ const Index = () => {
   const alunosAtivos = alunos?.filter(aluno => aluno.plano_ativo)?.length || 0;
   const totalPerfilamentos = filteredAnamneses?.length || 0;
   const totalPlays = filteredLogViews?.length || 0;
-  const totalInteracoes = filteredChatHistories?.length || 0;
+  const totalInteracoes = new Set(filteredChatHistories?.map(chat => chat.session_id)).size || 0;
 
   console.log("KPIs calculados:", {
     totalAlunos,
