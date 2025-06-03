@@ -369,7 +369,7 @@ const Index = () => {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2 text-gray-300">
                 <Target className="h-5 w-5 text-[#ff4444]" />
-                Taxa de Conversão
+                Taxa de Visualização
               </CardTitle>
             </CardHeader>
             <CardContent>
