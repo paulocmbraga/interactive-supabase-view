@@ -234,19 +234,7 @@ const Index = () => {
         )}
 
         {/* KPIs Principais */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
-          <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg hover:shadow-xl transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-300">Ativações</CardTitle>
-              <CheckCircle className="h-5 w-5 text-[#00ff88]" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-[#00ff88]">{alunosAtivos}</div>
-              <p className="text-xs text-gray-400">de {totalAlunos} alunos totais</p>
-              <Progress value={(alunosAtivos / totalAlunos) * 100} className="mt-2" indicatorClassName="bg-[#00ff88]" />
-            </CardContent>
-          </Card>
-
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
           <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-gray-300">Bem-vindas</CardTitle>
@@ -280,7 +268,7 @@ const Index = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg lg:col-span-4">
+          <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg lg:col-span-3">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-gray-300">
                 <Trophy className="h-5 w-5 text-[#ffd700]" />
@@ -323,7 +311,21 @@ const Index = () => {
         </div>
 
         {/* Estatísticas Detalhadas */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+          <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2 text-gray-300">
+                <CheckCircle className="h-5 w-5 text-[#00ff88]" />
+                Ativações
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-[#00ff88]">{alunosAtivos}</div>
+              <p className="text-sm text-gray-400">de {totalAlunos} alunos totais</p>
+              <Progress value={(alunosAtivos / totalAlunos) * 100} className="mt-2" indicatorClassName="bg-[#00ff88]" />
+            </CardContent>
+          </Card>
+
           <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2 text-gray-300">
