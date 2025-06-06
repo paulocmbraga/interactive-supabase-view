@@ -49,82 +49,84 @@ export function UserInteractionList({ users, chatHistories }: UserInteractionLis
           <Users className="h-7 w-7" />
           Usuários que Interagiram com a IA
         </div>
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-end mb-2">
           <PaginationControls page={page} totalPages={totalPages} setPage={setPage} />
         </div>
-        <table className="w-full text-sm text-left">
-          <thead>
-            <tr className="border-b border-muted-foreground/10">
-              <th className="px-4 py-2 font-semibold text-white">Nome</th>
-              <th className="px-4 py-2 font-semibold text-white">Email</th>
-              <th className="px-4 py-2 font-semibold text-white">Status</th>
-              <th className="px-4 py-2 font-semibold text-white">Data</th>
-              <th className="px-4 py-2 font-semibold text-white">Interações</th>
-              <th className="px-4 py-2 font-semibold text-white">Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedUsers.map((user) => (
-              <tr key={user.aluno_id} className="border-b border-muted-foreground/5 hover:bg-accent/30">
-                <td className="px-4 py-2 whitespace-nowrap text-white">{user.nome}</td>
-                <td className="px-4 py-2 whitespace-nowrap text-[#bdbdbd]">{user.email}</td>
-                <td className="px-4 py-2">
-                  {user.tem_perfilamento ? (
-                    <span className="inline-flex items-center rounded-full bg-green-600/90 px-4 py-1 text-xs font-semibold text-white gap-1">
-                      <CheckCircle2 size={16} className="mr-1" /> Completo
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center rounded-full bg-red-600/90 px-4 py-1 text-xs font-semibold text-white gap-1">
-                      <XCircle size={16} className="mr-1" />
-                      Pendente
-                    </span>
-                  )}
-                </td>
-                <td className="px-4 py-2 whitespace-nowrap text-[#bdbdbd]">{format(new Date(user.ultima_interacao), "dd/MM/yyyy", { locale: ptBR })}</td>
-                <td className="px-4 py-2 text-center text-[#bdbdbd]">{user.total_interacoes}</td>
-                <td className="px-4 py-2">
-                  <Dialog open={openUserId === user.aluno_id} onOpenChange={open => setOpenUserId(open ? user.aluno_id : null)}>
-                    <DialogTrigger asChild>
-                      <button className="inline-flex items-center gap-1 rounded bg-blue-600 px-3 py-1 text-xs font-semibold text-white hover:bg-blue-700 transition">
-                        <MessageCircle size={16} /> Ver conversas
-                      </button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-2xl bg-[#1a1a1a] border-gray-700 text-white">
-                      <DialogHeader>
-                        <DialogTitle className="text-[#00ff88]">Conversas de {user.nome}</DialogTitle>
-                        <div className="flex justify-end mt-2">
-                          <ExportChatButton messages={getUserMessages(user)} userName={user.nome} />
-                        </div>
-                      </DialogHeader>
-                      <div className="max-h-[400px] overflow-y-auto space-y-2 mt-4">
-                        {getUserMessages(user).length === 0 ? (
-                          <div className="text-center text-gray-400">Nenhuma mensagem encontrada.</div>
-                        ) : (
-                          getUserMessages(user).map(msg => {
-                            const isLead = typeof msg.message === 'object' && msg.message.type === 'human';
-                            return (
-                              <div 
-                                key={msg.id} 
-                                className={`rounded border border-gray-700 p-3 text-white ${
-                                  isLead ? 'bg-[#666]' : 'bg-[#353535]'
-                                }`}
-                              >
-                                <div className="text-xs text-zinc-400 mb-1">{format(new Date(msg.timestamptz), "dd/MM/yyyy HH:mm", { locale: ptBR })}</div>
-                                <div className="break-words">
-                                  {typeof msg.message === 'string' ? msg.message : msg.message.content}
-                                </div>
-                              </div>
-                            );
-                          })
-                        )}
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="min-w-[700px] w-full text-sm text-left">
+            <thead>
+              <tr className="border-b border-muted-foreground/10">
+                <th className="px-4 py-2 font-semibold text-white">Nome</th>
+                <th className="px-4 py-2 font-semibold text-white">Email</th>
+                <th className="px-4 py-2 font-semibold text-white">Status</th>
+                <th className="px-4 py-2 font-semibold text-white">Data</th>
+                <th className="px-4 py-2 font-semibold text-white">Interações</th>
+                <th className="px-4 py-2 font-semibold text-white">Ações</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {paginatedUsers.map((user) => (
+                <tr key={user.aluno_id} className="border-b border-muted-foreground/5 hover:bg-accent/30">
+                  <td className="px-4 py-2 whitespace-nowrap text-white">{user.nome}</td>
+                  <td className="px-4 py-2 whitespace-nowrap text-[#bdbdbd]">{user.email}</td>
+                  <td className="px-4 py-2">
+                    {user.tem_perfilamento ? (
+                      <span className="inline-flex items-center rounded-full bg-green-600/90 px-4 py-1 text-xs font-semibold text-white gap-1">
+                        <CheckCircle2 size={16} className="mr-1" /> Completo
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center rounded-full bg-red-600/90 px-4 py-1 text-xs font-semibold text-white gap-1">
+                        <XCircle size={16} className="mr-1" />
+                        Pendente
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-2 whitespace-nowrap text-[#bdbdbd]">{format(new Date(user.ultima_interacao), "dd/MM/yyyy", { locale: ptBR })}</td>
+                  <td className="px-4 py-2 text-center text-[#bdbdbd]">{user.total_interacoes}</td>
+                  <td className="px-4 py-2">
+                    <Dialog open={openUserId === user.aluno_id} onOpenChange={open => setOpenUserId(open ? user.aluno_id : null)}>
+                      <DialogTrigger asChild>
+                        <button className="inline-flex items-center gap-1 rounded bg-blue-600 px-3 py-1 text-xs font-semibold text-white hover:bg-blue-700 transition">
+                          <MessageCircle size={16} /> Ver conversas
+                        </button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-2xl bg-[#1a1a1a] border-gray-700 text-white">
+                        <DialogHeader>
+                          <DialogTitle className="text-[#00ff88]">Conversas de {user.nome}</DialogTitle>
+                          <div className="flex justify-end mt-2">
+                            <ExportChatButton messages={getUserMessages(user)} userName={user.nome} />
+                          </div>
+                        </DialogHeader>
+                        <div className="max-h-[400px] overflow-y-auto space-y-2 mt-4">
+                          {getUserMessages(user).length === 0 ? (
+                            <div className="text-center text-gray-400">Nenhuma mensagem encontrada.</div>
+                          ) : (
+                            getUserMessages(user).map(msg => {
+                              const isLead = typeof msg.message === 'object' && msg.message.type === 'human';
+                              return (
+                                <div 
+                                  key={msg.id} 
+                                  className={`rounded border border-gray-700 p-3 text-white ${
+                                    isLead ? 'bg-[#666]' : 'bg-[#353535]'
+                                  }`}
+                                >
+                                  <div className="text-xs text-zinc-400 mb-1">{format(new Date(msg.timestamptz), "dd/MM/yyyy HH:mm", { locale: ptBR })}</div>
+                                  <div className="break-words">
+                                    {typeof msg.message === 'string' ? msg.message : msg.message.content}
+                                  </div>
+                                </div>
+                              );
+                            })
+                          )}
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </ScrollArea>
   );
