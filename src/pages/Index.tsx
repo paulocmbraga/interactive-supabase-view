@@ -6,7 +6,7 @@ import { Users, Play, Bell, Trophy, Target, CheckCircle, UserCheck, BarChart3, L
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegendContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 import DateRangeFilter from "@/components/DateRangeFilter";
-import { UserInteractionList } from "@/components/UserInteractionList";
+import { UserInteractionList } from "@/components/ui/UserInteractionList";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import React, { useState, useMemo } from "react";
 
@@ -72,7 +72,7 @@ const Index = () => {
         .select('*');
       if (alunosError) throw alunosError;
 
-      // Fazer o join no cliente
+      // Fazer o join usando yupchat_id do aluno e session_id do chat
       const joinedData = chatData.map(chat => {
         const aluno = alunosData.find(a => a.yupchat_id === chat.session_id);
         return {
@@ -89,7 +89,6 @@ const Index = () => {
   // Função para filtrar dados por período
   const filterDataByDate = (data: any[], dateField: string) => {
     if (!data || (!startDate && !endDate)) return data;
-    
     return data.filter(item => {
       const itemDate = new Date(item[dateField]);
       if (startDate && itemDate < startDate) return false;
@@ -133,45 +132,77 @@ const Index = () => {
       tem_perfilamento: boolean;
       ultima_interacao: string;
       total_interacoes: number;
+      yupchat_id?: string;
     }
 
     const userMap = new Map<number, UserInteraction>();
 
-    // Processar interações do chat
+    // Agrega interações do chat
     chatHistories.forEach(chat => {
-      if (!chat.aluno) return;
-      
-      const alunoId = chat.aluno.aluno_id;
-      if (!userMap.has(alunoId)) {
+      const aluno = alunos.find(a => a.yupchat_id === chat.session_id);
+      if (!aluno) {
+        console.warn('Não encontrou aluno para session_id:', chat.session_id);
+        return;
+      }
+      const alunoId = aluno.aluno_id;
+      const existing = userMap.get(alunoId);
+      if (!existing) {
         userMap.set(alunoId, {
           aluno_id: alunoId,
-          nome: chat.aluno.nome,
-          email: chat.aluno.email,
+          nome: aluno.nome || '-',
+          email: aluno.email || '-',
           tem_perfilamento: false,
           ultima_interacao: chat.timestamptz,
-          total_interacoes: 1
+          total_interacoes: 1,
+          yupchat_id: aluno.yupchat_id
         });
       } else {
-        const user = userMap.get(alunoId);
-        if (user) {
-          user.total_interacoes++;
-          if (new Date(chat.timestamptz) > new Date(user.ultima_interacao)) {
-            user.ultima_interacao = chat.timestamptz;
-          }
+        existing.total_interacoes++;
+        if (new Date(chat.timestamptz) > new Date(existing.ultima_interacao)) {
+          existing.ultima_interacao = chat.timestamptz;
         }
       }
     });
 
-    // Verificar perfilamentos
-    anamneses?.forEach(anamnese => {
+    // Marca quem tem perfilamento e loga detalhes
+    (filteredAnamneses || []).forEach(anamnese => {
       const user = userMap.get(anamnese.aluno_id);
       if (user) {
         user.tem_perfilamento = true;
+      } else {
+        console.warn('Aluno perfilado não encontrado no chatHistories:', anamnese.aluno_id, anamnese);
       }
     });
 
+    // Logar todos os usuários agregados
+    console.log('Usuários agregados na lista:', Array.from(userMap.values()));
+    // Logar todos os alunos perfilados
+    console.log('Alunos perfilados (distinct):', (filteredAnamneses || []).map(a => a.aluno_id));
+
+    // Garante que só alunos distintos aparecem
     return Array.from(userMap.values());
-  }, [chatHistories, alunos, anamneses]);
+  }, [chatHistories, alunos, filteredAnamneses]);
+
+  // 1. Obter todos os session_id distintos do chat
+  const sessionIds = new Set(chatHistories?.map(chat => chat.session_id));
+
+  // 2. Fazer o join: session_id (chat) <-> yupchat_id (aluno)
+  const alunosComIA = alunos?.filter(aluno => sessionIds.has(aluno.yupchat_id)) || [];
+
+  // 3. Filtrar visualizações (log_view) apenas desses alunos
+  const userIdsComIA = new Set(alunosComIA.map(aluno => aluno.aluno_id));
+  const logViewsComIA = logViews?.filter(log => userIdsComIA.has(log.aluno_id)) || [];
+
+  // 4. Contar
+  const totalBemVindas = sessionIds.size;
+  const totalAlunosComIA = alunosComIA.length;
+  const totalVisualizacoesComIA = logViewsComIA.length;
+
+  // Log para depuração
+  console.log('Total Bem-vindas (session_id distintos):', totalBemVindas);
+  console.log('Alunos que interagiram com a IA:', alunosComIA);
+  console.log('Total de alunos que interagiram:', totalAlunosComIA);
+  console.log('Total de visualizações desses alunos:', totalVisualizacoesComIA);
 
   if (loadingAlunos || loadingAnamneses || loadingLogs || loadingChat) {
     return (
@@ -194,7 +225,7 @@ const Index = () => {
   }) || [];
   
   const alunosAtivos = alunosAtivosComChat.length;
-  const totalPerfilamentos = filteredAnamneses?.length || 0;
+  const totalPerfilamentos = new Set(filteredAnamneses?.map(a => a.aluno_id)).size || 0;
   const totalPlays = filteredLogViews?.length || 0;
   const totalInteracoes = new Set(filteredChatHistories?.map(chat => chat.session_id)).size || 0;
 
@@ -488,14 +519,9 @@ const Index = () => {
           <TabsContent value="users">
             <div className="mt-4">
               <Card className="bg-[#1a1a1a] border-gray-700">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-[#00ff88]">
-                    <Users className="h-5 w-5" />
-                    Usuários que Interagiram com a IA
-                  </CardTitle>
-                </CardHeader>
+                {/* Título removido, ficará dentro do UserInteractionList */}
                 <CardContent>
-                  <UserInteractionList users={userInteractions} />
+                  <UserInteractionList users={userInteractions} chatHistories={chatHistories} />
                 </CardContent>
               </Card>
             </div>
