@@ -2,10 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Users, Play, Bell, Trophy, Target, CheckCircle, UserCheck, BarChart3 } from "lucide-react";
+import { Users, Play, Bell, Trophy, Target, CheckCircle, UserCheck, BarChart3, List } from "lucide-react";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegendContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 import DateRangeFilter from "@/components/DateRangeFilter";
+import { UserInteractionList } from "@/components/UserInteractionList";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import React, { useState, useMemo } from "react";
 
 const Index = () => {
@@ -119,6 +121,57 @@ const Index = () => {
     console.log("Chat histories filtrados:", filtered);
     return filtered;
   }, [chatHistories, startDate, endDate]);
+
+  // Processar dados para a lista de usuários
+  const userInteractions = useMemo(() => {
+    if (!chatHistories || !alunos) return [];
+
+    interface UserInteraction {
+      aluno_id: number;
+      nome: string;
+      email: string;
+      tem_perfilamento: boolean;
+      ultima_interacao: string;
+      total_interacoes: number;
+    }
+
+    const userMap = new Map<number, UserInteraction>();
+
+    // Processar interações do chat
+    chatHistories.forEach(chat => {
+      if (!chat.aluno) return;
+      
+      const alunoId = chat.aluno.aluno_id;
+      if (!userMap.has(alunoId)) {
+        userMap.set(alunoId, {
+          aluno_id: alunoId,
+          nome: chat.aluno.nome,
+          email: chat.aluno.email,
+          tem_perfilamento: false,
+          ultima_interacao: chat.timestamptz,
+          total_interacoes: 1
+        });
+      } else {
+        const user = userMap.get(alunoId);
+        if (user) {
+          user.total_interacoes++;
+          if (new Date(chat.timestamptz) > new Date(user.ultima_interacao)) {
+            user.ultima_interacao = chat.timestamptz;
+          }
+        }
+      }
+    });
+
+    // Verificar perfilamentos
+    anamneses?.forEach(anamnese => {
+      const user = userMap.get(anamnese.aluno_id);
+      if (user) {
+        user.tem_perfilamento = true;
+      }
+    });
+
+    return Array.from(userMap.values());
+  }, [chatHistories, alunos, anamneses]);
 
   if (loadingAlunos || loadingAnamneses || loadingLogs || loadingChat) {
     return (
@@ -272,144 +325,182 @@ const Index = () => {
           </div>
         )}
 
-        {/* KPIs Principais */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-          <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg hover:shadow-xl transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-300">Bem-vindas</CardTitle>
-              <UserCheck className="h-5 w-5 text-[#00b4ff]" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-[#00b4ff]">{totalInteracoes}</div>
-              <p className="text-xs text-gray-400">interações registradas</p>
-            </CardContent>
-          </Card>
+        {/* Tabs */}
+        <Tabs defaultValue="dashboard" className="mt-8">
+          <TabsList className="grid w-full grid-cols-2 bg-[#1a1a1a] border border-gray-700">
+            <TabsTrigger 
+              value="dashboard" 
+              className="flex items-center gap-2 data-[state=active]:bg-[#2d2d2d] data-[state=active]:text-[#00ff88] text-gray-400"
+            >
+              <BarChart3 className="h-4 w-4" />
+              Dashboard
+            </TabsTrigger>
+            <TabsTrigger 
+              value="users" 
+              className="flex items-center gap-2 data-[state=active]:bg-[#2d2d2d] data-[state=active]:text-[#00ff88] text-gray-400"
+            >
+              <List className="h-4 w-4" />
+              Usuários
+            </TabsTrigger>
+          </TabsList>
 
-          <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg hover:shadow-xl transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-300">Perfilamentos</CardTitle>
-              <Users className="h-5 w-5 text-[#ff00ff]" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-[#ff00ff]">{totalPerfilamentos}</div>
-              <p className="text-xs text-gray-400">anamneses concluídas</p>
-            </CardContent>
-          </Card>
+          <TabsContent value="dashboard">
+            {/* KPIs Principais */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+              <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg hover:shadow-xl transition-shadow">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-300">Bem-vindas</CardTitle>
+                  <UserCheck className="h-5 w-5 text-[#00b4ff]" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-[#00b4ff]">{totalInteracoes}</div>
+                  <p className="text-xs text-gray-400">interações registradas</p>
+                </CardContent>
+              </Card>
 
-          <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg hover:shadow-xl transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-300">Plays Totais</CardTitle>
-              <Play className="h-5 w-5 text-[#ff8800]" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-[#ff8800]">{totalPlays}</div>
-              <p className="text-xs text-gray-400">visualizações de conteúdo</p>
-            </CardContent>
-          </Card>
+              <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg hover:shadow-xl transition-shadow">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-300">Perfilamentos</CardTitle>
+                  <Users className="h-5 w-5 text-[#ff00ff]" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-[#ff00ff]">{totalPerfilamentos}</div>
+                  <p className="text-xs text-gray-400">anamneses concluídas</p>
+                </CardContent>
+              </Card>
 
-          <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg lg:col-span-3">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-gray-300">
-                <Trophy className="h-5 w-5 text-[#ffd700]" />
-                Ranking de Cursos
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={chartConfig} className="h-[350px] w-full pb-4">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={rankingData} margin={{ bottom: 20 }}>
-                    <YAxis fontSize={12} stroke="#666" />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar dataKey="plays" radius={[4, 4, 0, 0]}>
-                      {rankingData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Bar>
-                    <Legend 
-                      content={({ payload }) => (
-                        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 md:pl-4 lg:pl-8" style={{ marginTop: '30px' }}>
+              <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg hover:shadow-xl transition-shadow">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-300">Plays Totais</CardTitle>
+                  <Play className="h-5 w-5 text-[#ff8800]" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-[#ff8800]">{totalPlays}</div>
+                  <p className="text-xs text-gray-400">visualizações de conteúdo</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg lg:col-span-3">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-gray-300">
+                    <Trophy className="h-5 w-5 text-[#ffd700]" />
+                    Ranking de Cursos
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ChartContainer config={chartConfig} className="h-[350px] w-full pb-4">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={rankingData} margin={{ bottom: 20 }}>
+                        <YAxis fontSize={12} stroke="#666" />
+                        <ChartTooltip content={<ChartTooltipContent />} />
+                        <Bar dataKey="plays" radius={[4, 4, 0, 0]}>
                           {rankingData.map((entry, index) => (
-                            <div key={`legend-${index}`} className="flex items-center gap-2">
-                              <div 
-                                className="h-3 w-3"
-                                style={{
-                                  backgroundColor: entry.color,
-                                }}
-                              ></div>
-                              <span className="text-sm text-gray-300">{entry.curso}</span>
-                            </div>
+                            <Cell key={`cell-${index}`} fill={entry.color} />
                           ))}
-                        </div>
-                      )}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-        </div>
+                        </Bar>
+                        <Legend 
+                          content={({ payload }) => (
+                            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 md:pl-4 lg:pl-8" style={{ marginTop: '30px' }}>
+                              {rankingData.map((entry, index) => (
+                                <div key={`legend-${index}`} className="flex items-center gap-2">
+                                  <div 
+                                    className="h-3 w-3"
+                                    style={{
+                                      backgroundColor: entry.color,
+                                    }}
+                                  ></div>
+                                  <span className="text-sm text-gray-300">{entry.curso}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </ChartContainer>
+                </CardContent>
+              </Card>
+            </div>
 
-        {/* Estatísticas Detalhadas */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
-          <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2 text-gray-300">
-                <CheckCircle className="h-5 w-5 text-[#00ff88]" />
-                Ativações
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-[#00ff88]">{alunosAtivos}</div>
-              <p className="text-sm text-gray-400">de {totalAlunos} alunos totais</p>
-              <Progress value={(alunosAtivos / totalAlunos) * 100} className="mt-2" indicatorClassName="bg-[#00ff88]" />
-            </CardContent>
-          </Card>
+            {/* Estatísticas Detalhadas */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+              <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2 text-gray-300">
+                    <CheckCircle className="h-5 w-5 text-[#00ff88]" />
+                    Ativações
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-[#00ff88]">{alunosAtivos}</div>
+                  <p className="text-sm text-gray-400">de {totalAlunos} alunos totais</p>
+                  <Progress value={(alunosAtivos / totalAlunos) * 100} className="mt-2" indicatorClassName="bg-[#00ff88]" />
+                </CardContent>
+              </Card>
 
-          <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2 text-gray-300">
-                <Target className="h-5 w-5 text-[#ff4444]" />
-                Taxa de Visualização
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-[#ff4444]">
-                {taxaConversao}%
-              </div>
-              <p className="text-sm text-gray-400">de alunos com plays</p>
-            </CardContent>
-          </Card>
+              <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2 text-gray-300">
+                    <Target className="h-5 w-5 text-[#ff4444]" />
+                    Taxa de Visualização
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-[#ff4444]">
+                    {taxaConversao}%
+                  </div>
+                  <p className="text-sm text-gray-400">de alunos com plays</p>
+                </CardContent>
+              </Card>
 
-          <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2 text-gray-300">
-                <Bell className="h-5 w-5 text-[#8844ff]" />
-                Engajamento Médio
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-[#8844ff]">
-                {mediaPlaysPorAluno}
-              </div>
-              <p className="text-sm text-gray-400">plays por aluno</p>
-            </CardContent>
-          </Card>
+              <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2 text-gray-300">
+                    <Bell className="h-5 w-5 text-[#8844ff]" />
+                    Engajamento Médio
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-[#8844ff]">
+                    {mediaPlaysPorAluno}
+                  </div>
+                  <p className="text-sm text-gray-400">plays por aluno</p>
+                </CardContent>
+              </Card>
 
-          <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2 text-gray-300">
-                <Users className="h-5 w-5 text-[#44ff88]" />
-                Média de Recomendações
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-[#44ff88]">
-                {mediaRecomendacoes}%
-              </div>
-              <p className="text-xs text-gray-400">anamneses concluídas</p>
-            </CardContent>
-          </Card>
-        </div>
+              <Card className="bg-[#2d2d2d] border-[#3d3d3d] shadow-lg">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2 text-gray-300">
+                    <Users className="h-5 w-5 text-[#44ff88]" />
+                    Média de Recomendações
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-[#44ff88]">
+                    {mediaRecomendacoes}%
+                  </div>
+                  <p className="text-xs text-gray-400">anamneses concluídas</p>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="users">
+            <div className="mt-4">
+              <Card className="bg-[#1a1a1a] border-gray-700">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-[#00ff88]">
+                    <Users className="h-5 w-5" />
+                    Usuários que Interagiram com a IA
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <UserInteractionList users={userInteractions} />
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
